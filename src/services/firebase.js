@@ -3,7 +3,8 @@
 
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
+import { initializeAuth, getReactNativePersistence } from "firebase/auth";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 // NOTE: Firebase Storage requires Blaze plan — add later when needed
 // import { getStorage } from "firebase/storage";
 
@@ -26,8 +27,10 @@ const app = initializeApp(firebaseConfig);
 // Firestore — cloud database for syncing reports, stock counts, etc.
 export const db = getFirestore(app);
 
-// Auth — for staff login (supports email/password, anonymous, etc.)
-export const auth = getAuth(app);
+// Auth — persists login state between app sessions using AsyncStorage
+export const auth = initializeAuth(app, {
+  persistence: getReactNativePersistence(AsyncStorage),
+});
 
 // Storage — requires Blaze plan, uncomment when upgraded
 // export const storage = getStorage(app);

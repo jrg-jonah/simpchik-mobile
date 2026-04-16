@@ -92,12 +92,20 @@ async function syncTable(tableName, collectionName) {
 // automatically triggers a sync. Call this ONCE in App.js.
 // Returns an unsubscribe function for cleanup.
 // -------------------------------------------------------
+// Debounce timer to prevent multiple rapid sync triggers
+let syncTimeout = null;
+
 export function startAutoSync() {
   const unsubscribe = NetInfo.addEventListener((state) => {
     if (state.isConnected && state.isInternetReachable) {
-      console.log("🌐 Online — starting sync...");
-      syncAll();
+      // Debounce: wait 2 seconds before syncing (NetInfo fires multiple times)
+      if (syncTimeout) clearTimeout(syncTimeout);
+      syncTimeout = setTimeout(() => {
+        console.log("🌐 Online — starting sync...");
+        syncAll();
+      }, 2000);
     } else {
+      if (syncTimeout) clearTimeout(syncTimeout);
       console.log("📴 Offline — data saved locally");
     }
   });
